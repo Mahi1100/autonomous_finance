@@ -1,0 +1,29 @@
+{
+  "saas_company": {
+    "business_units": {
+      "large_customers": {
+        "go_to_market": "Direct sales via salespeople",
+        "assumptions": {
+          "revenue_per_customer_month": 16667,
+          "sales_per_rep_per_month": 1.5
+        },
+        "formulas": {
+          "revenue": "#customers * 16667"
+        }
+      },
+      "small_medium_customers": {
+        "go_to_market": "Digital marketing campaigns",
+        "assumptions": {
+          "cac": 1500,
+          "conversion_rate": 0.45,
+          "avg_revenue_per_customer": 5000,
+          "marketing_spend": 200000
+        },
+        "formulas": {
+          "revenue": "#customers * 5000"
+        }
+      }
+    },
+    "revenue_drivers": ["number_of_sales_people", "marketing_spend", "conversion_rate"]
+  }
+}
