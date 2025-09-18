@@ -10,24 +10,18 @@ class FinanceService:
         self.llm_service = LLMService()
         self.knowledge_base = KnowledgeBase()
         self.formula_engine = FormulaEngine()
-        # simple in-memory cache: model_id -> FinancialModel
         self.models_cache: Dict[str, FinancialModel] = {}
 
     async def process_query(self, user_query: str) -> QueryResponse:
-        # Step 1: parse query via LLM
         llm_result = await self.llm_service.process_natural_language_query(user_query)
 
-        # Step 2: create FinancialModel
         model = self._create_financial_model(user_query, llm_result)
 
-        # Step 3: calculate projections
         months = int(llm_result.get("time_horizon_months", 12))
         model.calculate_projections(months)
 
-        # Step 4: cache
         self.models_cache[model.model_id] = model
 
-        # Step 5: build response
         excel_url = f"/api/v1/export/excel/{model.model_id}"
         return QueryResponse(
             model_id=model.model_id,
@@ -41,11 +35,9 @@ class FinanceService:
     def _create_financial_model(self, query: str, llm_response: Dict[str, Any]) -> FinancialModel:
         model = FinancialModel(query=query)
         model.assumptions = llm_response.get("assumptions", {})
-        # create revenue drivers
         for d in llm_response.get("revenue_drivers", []):
             driver = RevenueDriver(**d)
             model.revenue_drivers.append(driver)
-        # populate business units from knowledge base if present in focus
         kb = self.knowledge_base.get_saas_rules()
         for unit_name, unit_data in kb.get("business_units", {}).items():
             model.business_units[unit_name] = BusinessUnit(
