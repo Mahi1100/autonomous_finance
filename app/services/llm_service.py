@@ -9,14 +9,12 @@ if settings.openai_api_key:
 
 class LLMService:
     def __init__(self):
-        # client can use openai SDK functions directly
         self.client = openai
 
     async def process_natural_language_query(self, user_query: str) -> Dict[str, Any]:
         
         prompt = self._build_financial_prompt(user_query)
         try:
-            # Use a completions/chat call; adapt to installed openai version
             resp = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
@@ -27,10 +25,8 @@ class LLMService:
                 max_tokens=1000,
             )
             content = resp.choices[0].message.content
-            # Expect LLM to return JSON — parse
             return json.loads(content)
         except Exception:
-            # fallback rule-based quick parse
             return self._fallback_parsing(user_query)
 
     def _build_financial_prompt(self, user_query: str) -> str:
@@ -51,7 +47,6 @@ class LLMService:
         )
 
     def _fallback_parsing(self, user_query: str) -> Dict[str, Any]:
-        # Very simple regex-based parser for quick fallback
         import re
         q = user_query.lower()
         months = 12
@@ -62,7 +57,6 @@ class LLMService:
         m2 = re.search(r'(\d+)\s*(salespeople|sales people|salesperson)', q)
         if m2:
             sales_people = int(m2.group(1))
-        # assemble basic json
         return {
             "time_horizon_months": months,
             "revenue_drivers": [
