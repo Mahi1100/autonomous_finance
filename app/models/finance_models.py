@@ -5,7 +5,7 @@ import uuid
 
 class RevenueDriver(BaseModel):
     name: str
-    type: str  # "input" | "assumption" | "calculated"
+    type: str  
     value: Optional[float] = None
     unit: Optional[str] = None
     formula: Optional[str] = None
@@ -40,7 +40,6 @@ class FinancialModel(BaseModel):
     assumptions: Dict[str, Any] = {}
 
     def calculate_projections(self, months: int = 12):
-        # Delegates to formula engine - import here to avoid circular import
         from app.utils.formula_engine import FormulaEngine
         engine = FormulaEngine()
         self.monthly_projections = engine.calculate_monthly_projections(
